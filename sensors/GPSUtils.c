@@ -3,6 +3,28 @@
 char COMPLETE_MESSAGE[MINMEA_MAX_LENGTH];
 char PARTIAL_MESSAGE[MINMEA_MAX_LENGTH];
 
+/**
+ * Convert a raw coordinate to a floating point DD.DDD... value.
+ * Returns NaN for "unknown" values.
+ */
+float tocoord(int value, int scale) {
+
+    printf("value: %d, scale: %d\n", value, scale);
+    if (scale == 0) {
+        return 0;
+    }
+
+    printf("value: %d, scale: %d\n", value, scale);
+
+    int degrees = value / (scale * 100);
+    int minutes = value % (scale * 100);
+
+    printf("degrees: %f, minutes: %f\n", (float)degrees, (float)minutes);
+
+    return (float) degrees + (float) minutes / (60 * scale);
+
+}
+
 void something (char* line) {
     switch (minmea_sentence_id(line, false)) {
         case MINMEA_SENTENCE_RMC: {
@@ -47,6 +69,9 @@ void something (char* line) {
         case MINMEA_SENTENCE_GLL: {
             struct minmea_sentence_gll frame;
             if (minmea_parse_gll(&frame, line)) {
+                //printf("tocoord: %f\n", minmea_tocoord(&frame.latitude));
+
+
                 printf("$GLL: mode %c\n", frame.mode);
                 printf("$GLL: status %c\n", frame.status);
                 printf("$GLL: latitude %d\n", frame.latitude.value);

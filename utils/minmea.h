@@ -257,30 +257,6 @@ static inline float minmea_tocoord(struct minmea_float *f)
     return (float) degrees + (float) minutes / (60 * f->scale);
 }
 
-/**
- * Convert a raw coordinate to a floating point DD.DDD... value.
- * Returns NaN for "unknown" values.
- */
-static inline float minmea_tocoord_2(int value, int scale)
-{
-
-    printf("value: %d, scale: %d\n", value, scale);
-
-    if (scale == 0) {
-        return 0;
-    }
-
-    printf("value: %d, scale: %d\n", value, scale);
-
-    int degrees = value / (scale * 100);
-    int minutes = value % (scale * 100);
-
-    printf("degrees: %f, minutes: %f\n", (float)degrees, (float)minutes);
-
-    return (float) degrees + (float) minutes / (60 * scale);
-
-}
-
 #ifdef __cplusplus
 }
 #endif
