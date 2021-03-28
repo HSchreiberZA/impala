@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "minmea.h"
+#include "../utils/minmea.h"
 
 void receiveGPSChar (char c);
 

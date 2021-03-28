@@ -23,7 +23,7 @@
 #include "board.h"
 #include "periph_conf.h"
 #include "periph/uart.h"
-#include "GPSUtils.h"
+#include "sensors/GPSUtils.h"
 
 void gps_callback (void *arg, uint8_t data) {
     char character = (char)data;
