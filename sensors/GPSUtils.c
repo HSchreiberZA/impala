@@ -3,29 +3,7 @@
 char COMPLETE_MESSAGE[MINMEA_MAX_LENGTH];
 char PARTIAL_MESSAGE[MINMEA_MAX_LENGTH];
 
-/**
- * Convert a raw coordinate to a floating point DD.DDD... value.
- * Returns NaN for "unknown" values.
- */
-float tocoord(int value, int scale) {
-
-    printf("value: %d, scale: %d\n", value, scale);
-    if (scale == 0) {
-        return 0;
-    }
-
-    printf("value: %d, scale: %d\n", value, scale);
-
-    int degrees = value / (scale * 100);
-    int minutes = value % (scale * 100);
-
-    printf("degrees: %f, minutes: %f\n", (float)degrees, (float)minutes);
-
-    return (float) degrees + (float) minutes / (60 * scale);
-
-}
-
-void something (char* line) {
+void parseGPSMessage (char* line) {
     switch (minmea_sentence_id(line, false)) {
         case MINMEA_SENTENCE_RMC: {
             struct minmea_sentence_rmc frame;
@@ -38,10 +16,10 @@ void something (char* line) {
                         minmea_rescale(&frame.latitude, 1000),
                         minmea_rescale(&frame.longitude, 1000),
                         minmea_rescale(&frame.speed, 1000));
-                /*printf("$RMC floating point degree coordinates and speed: (%f,%f) %f\n",
+                printf("$RMC floating point degree coordinates and speed: (%f,%f) %f\n",
                         minmea_tocoord(&frame.latitude),
                         minmea_tocoord(&frame.longitude),
-                        minmea_tofloat(&frame.speed));*/
+                        minmea_todouble(&frame.speed));
             }
         } break;
 
@@ -69,13 +47,10 @@ void something (char* line) {
         case MINMEA_SENTENCE_GLL: {
             struct minmea_sentence_gll frame;
             if (minmea_parse_gll(&frame, line)) {
-                //printf("tocoord: %f\n", minmea_tocoord(&frame.latitude));
-
-
                 printf("$GLL: mode %c\n", frame.mode);
                 printf("$GLL: status %c\n", frame.status);
-                printf("$GLL: latitude %d\n", frame.latitude.value);
-                printf("$GLL: longitude %d\n", frame.longitude.value);
+                printf("$GLL: latitude %f\n", minmea_tocoord(&frame.latitude));
+                printf("$GLL: longitude %f\n", minmea_tocoord(&frame.longitude));
             }
         } break;
         default:
@@ -92,7 +67,6 @@ void receiveGPSChar (char c) {
     if (c == '\n') {
         strcpy(COMPLETE_MESSAGE, PARTIAL_MESSAGE);
         strcpy(PARTIAL_MESSAGE, "");
-        //printf("%s", COMPLETE_MESSAGE);
-        something(COMPLETE_MESSAGE);
+        parseGPSMessage(COMPLETE_MESSAGE);
     }
 }
