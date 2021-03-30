@@ -17,6 +17,6 @@ EXTERNAL_MODULE_DIRS += $(CURDIR)/utils
 # and the BME280's address (see datasheet).
 # The values below are the defaults:
 CFLAGS += -DBMX280_PARAM_I2C_DEV=I2C_DEV\(0\)
-CFLAGS += -DBMX280_PARAM_I2C_ADDR=0x77
+CFLAGS += -DBMX280_PARAM_I2C_ADDR=0x76
 
 include $(RIOTBASE)/Makefile.include
