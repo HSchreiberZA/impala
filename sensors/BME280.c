@@ -1,6 +1,6 @@
 #include "BME280.h"
 
-bmx280_params_t params(i2c_t i2c_dev, uint8_t i2c_addr) {
+bmx280_params_t BMX280Params(i2c_t i2c_dev, uint8_t i2c_addr) {
     bmx280_params_t params;
     params = (bmx280_params_t) {
         .i2c_dev = i2c_dev,
@@ -16,7 +16,7 @@ bmx280_params_t params(i2c_t i2c_dev, uint8_t i2c_addr) {
 }
 
 int BME280Init(bmx280_t* dev, i2c_t i2c_dev, uint8_t i2c_addr) {
-    bmx280_params_t paramValues = params(i2c_dev, i2c_addr);
+    bmx280_params_t paramValues = BMX280Params(i2c_dev, i2c_addr);
     return bmx280_init(dev, &paramValues);
 }
 

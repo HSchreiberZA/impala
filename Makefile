@@ -5,6 +5,7 @@ RIOTBASE ?= $(CURDIR)/../RIOT/
 # a minimal application Makefile
 # BME280 connected via I2C
 USEMODULE += bme280_i2c
+USEMODULE += sps30
 USEMODULE += esp32_ttgo_t_beam_v1_0
 USEMODULE += sensors
 EXTERNAL_MODULE_DIRS += $(CURDIR)/sensors
