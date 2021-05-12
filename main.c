@@ -26,6 +26,11 @@
 #include "periph/i2c.h"
 #include "sensors/GPSUtils.h"
 #include "sensors/BME280.h"
+#include "network/wifi.h"
+
+#include "msg.h"
+#include "shell.h"
+#include "xtimer.h"
 
 void gps_callback (void *arg, uint8_t data) {
     char character = (char)data;
@@ -36,6 +41,10 @@ int main(void)
 {
     board_init();
 
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+
+/*
     int enabled = uart_init(UART_DEV(1), 9600, gps_callback, NULL);
     i2c_init(BMX280_PARAM_I2C_DEV);
 
@@ -52,7 +61,7 @@ int main(void)
         printf("Pressure reading %dPA\n", readPressure(dev));
         printf("Humidity reading %f\n", readHumidity(dev));
     }
-
+*/
     printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
     printf("This board features a(n) %s MCU.\n", RIOT_MCU);
 
