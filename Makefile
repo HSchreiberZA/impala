@@ -15,7 +15,11 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_icmpv6_echo
+USEMODULE += gnrc_lorawan
+USEMODULE += gnrc_pktdump
+USEMODULE += gnrc_neterr
 
+DEVELHELP ?= 1
 
 USEMODULE += sensors
 EXTERNAL_MODULE_DIRS += $(CURDIR)/sensors
@@ -29,7 +33,7 @@ EXTERNAL_MODULE_DIRS += $(CURDIR)/network
 LORA_DRIVER ?= sx1276
 LORA_REGION ?= EU868
 
-USEPKG += semtech-loramac
+#USEPKG += semtech-loramac
 USEMODULE += $(LORA_DRIVER)
 
 USEMODULE += shell
@@ -43,6 +47,11 @@ LOG_LEVEL = LOG_DEBUG
 # The values below are the defaults:
 CFLAGS += -DBMX280_PARAM_I2C_DEV=I2C_DEV\(0\)
 CFLAGS += -DBMX280_PARAM_I2C_ADDR=0x76
+
+CFLAGS += -DCONFIG_LORAMAC_DEFAULT_JOIN_PROCEDURE_OTAA
+CFLAGS += -DCONFIG_LORAMAC_REGION_EU_868
+CFLAGS += -DCONFIG_LORAMAC_DEFAULT_TX_MODE_UNCNF
+CFLAGS += -DCONFIG_LORAMAC_DEFAULT_RX2_DR_3
 
 include secrets/Makefile
 include $(RIOTBASE)/Makefile.include
