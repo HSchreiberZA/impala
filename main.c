@@ -20,16 +20,11 @@
  */
 
 #include <stdio.h>
-#include "board.h"
-#include "periph_conf.h"
 #include "periph/uart.h"
 #include "periph/i2c.h"
 #include "sensors/GPSUtils.h"
 #include "sensors/BME280.h"
 #include "sensors/SPS30.h"
-
-#undef I2C0_SPEED
-#define I2C0_SPEED I2C_SPEED_NORMAL
 
 void gps_callback (void *arg, uint8_t data) {
     char character = (char)data;
@@ -39,8 +34,6 @@ void gps_callback (void *arg, uint8_t data) {
 int main(void)
 {
     puts("Hello World!");
-
-    printf("I2C0_Speed set to %d\n", I2C0_SPEED);
 
     board_init();
 
@@ -53,9 +46,12 @@ int main(void)
     printf("BMX280 init value: %d\n", initBMX280Value);
     */
 
-    sps30_t *SPS30Dev = malloc(sizeof(sps30_t*));
-    int initSPS30Value = SPS30Init(SPS30Dev);
+    int initSPS30Value = init_sps30();
     printf("SPS30 init value: %d\n", initSPS30Value);
+    sps30_data_t *data = malloc(sizeof(sps30_data_t));
+    int readSPS30Value = read_sps30(data);
+    printf("SPS30 read value: %d\n", readSPS30Value);
+    printf("SPS30 read value ps: %f\n", data->ps);
 
 
     //printf("GPS init returned %d\n", enabled);
