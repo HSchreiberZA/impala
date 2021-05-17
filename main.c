@@ -41,6 +41,15 @@ int main(void)
 
     board_init();
 
+    i2c_init(BMX280_PARAM_I2C_DEV);
+    
+    int initSPS30Value = init_sps30();
+    printf("SPS30 init value: %d\n", initSPS30Value);
+    sps30_data_t *data = malloc(sizeof(sps30_data_t));
+    int readSPS30Value = read_sps30(data);
+    printf("SPS30 read value: %d\n", readSPS30Value);
+    printf("SPS30 read value ps: %f\n", data->ps);
+
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
@@ -48,11 +57,9 @@ int main(void)
     int enabled = uart_init(UART_DEV(1), 9600, gps_callback, NULL);
     i2c_init(BMX280_PARAM_I2C_DEV);
 
-    /*
     bmx280_t* BMX280Dev = malloc(sizeof(bmx280_t*));
     int initBMX280Value = BME280Init(BMX280Dev, BMX280_PARAM_I2C_DEV, BMX280_PARAM_I2C_ADDR);
     printf("BMX280 init value: %d\n", initBMX280Value);
-    */
 
     int initSPS30Value = init_sps30();
     printf("SPS30 init value: %d\n", initSPS30Value);
@@ -64,7 +71,6 @@ int main(void)
 
     //printf("GPS init returned %d\n", enabled);
 
-    /*
     if (initBMX280Value == BMX280_OK) {
         printf("Temperature reading %f°C\n", readTemperature(BMX280Dev));
         printf("Pressure reading %dPA\n", readPressure(BMX280Dev));
