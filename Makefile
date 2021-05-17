@@ -4,7 +4,9 @@ RIOTBASE ?= $(CURDIR)/../RIOT/
 
 # a minimal application Makefile
 # BME280 connected via I2C
+USEMODULE += periph_i2c
 USEMODULE += bme280_i2c
+USEMODULE += sps30
 USEMODULE += esp32_ttgo_t_beam_v1_0
 # Modules to include:
 USEMODULE += shell
@@ -16,6 +18,8 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_icmpv6_echo
 
+
+DEVELHELP ?= 1
 
 USEMODULE += sensors
 EXTERNAL_MODULE_DIRS += $(CURDIR)/sensors
@@ -31,6 +35,7 @@ EXTERNAL_MODULE_DIRS += $(CURDIR)/network
 # The values below are the defaults:
 CFLAGS += -DBMX280_PARAM_I2C_DEV=I2C_DEV\(0\)
 CFLAGS += -DBMX280_PARAM_I2C_ADDR=0x76
+CFLAGS += -DI2C0_SPEED=I2C_SPEED_LOW
 
 include secrets/Makefile
 include $(RIOTBASE)/Makefile.include
