@@ -1,34 +1,19 @@
-/*
- * Copyright (C) 2014 Freie Universität Berlin
- *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License v2.1. See the file LICENSE in the top level
- * directory for more details.
- */
-
-/**
- * @ingroup     examples
- * @{
- *
- * @file
- * @brief       Hello World application
- *
- * @author      Kaspar Schleiser <kaspar@schleiser.de>
- * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
- *
- * @}
- */
-
 #include <stdio.h>
 #include "periph/uart.h"
 #include "periph/i2c.h"
 #include "sensors/GPSUtils.h"
 #include "sensors/BME280.h"
+#include "thread.h"
 #include "network/wifi.h"
 #include "msg.h"
 #include "shell.h"
 #include "xtimer.h"
 #include "sensors/SPS30.h"
+#include "network/tcp_client.h"
+#include "esp_wifi.h"
+
+#define MAIN_QUEUE_SIZE     (8)
+static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 void gps_callback (void *arg, uint8_t data) {
     char character = (char)data;
@@ -41,6 +26,22 @@ int main(void)
 
     board_init();
 
+    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
+
+    xtimer_sleep(20);
+    
+    esp_wifi_connect();
+
+    printf("\nStarting Client Threads. TARGET_ADDR=%s, TARGET_PORT=%d, ", TARGET_ADDR, TARGET_PORT);
+    printf("CONNS=%d, NBYTE=%d, CYCLES=%d\n\n", CONNS, NBYTE, CYCLES );
+
+    /* Start connection handling threads */
+    for (int i = 0; i < CONNS; i += 1) {
+        thread_create((char *) stacks[i], sizeof(stacks[i]), THREAD_PRIORITY_MAIN, 0, cli_thread,
+                      (void *) i, NULL);
+    }
+
+    /*
     i2c_init(BMX280_PARAM_I2C_DEV);
     
     int initSPS30Value = init_sps30();
@@ -49,7 +50,8 @@ int main(void)
     int readSPS30Value = read_sps30(data);
     printf("SPS30 read value: %d\n", readSPS30Value);
     printf("SPS30 read value ps: %f\n", data->ps);
-
+    */
+    
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
 
