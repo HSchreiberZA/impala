@@ -4,13 +4,11 @@
 #include "sensors/GPSUtils.h"
 #include "sensors/BME280.h"
 #include "thread.h"
-#include "network/wifi.h"
 #include "msg.h"
 #include "shell.h"
 #include "xtimer.h"
 #include "sensors/SPS30.h"
-#include "network/tcp_client.h"
-#include "esp_wifi.h"
+#include "network/CoapClient.h"
 
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
