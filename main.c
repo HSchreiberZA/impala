@@ -30,16 +30,16 @@ int main(void)
 
     xtimer_sleep(20);
     
-    esp_wifi_connect();
+    coapTest();
 
-    printf("\nStarting Client Threads. TARGET_ADDR=%s, TARGET_PORT=%d, ", TARGET_ADDR, TARGET_PORT);
-    printf("CONNS=%d, NBYTE=%d, CYCLES=%d\n\n", CONNS, NBYTE, CYCLES );
+    //printf("\nStarting Client Threads. TARGET_ADDR=%s, TARGET_PORT=%d, ", TARGET_ADDR, TARGET_PORT);
+    //printf("CONNS=%d, NBYTE=%d, CYCLES=%d\n\n", CONNS, NBYTE, CYCLES );
 
-    /* Start connection handling threads */
+    /* Start connection handling threads 
     for (int i = 0; i < CONNS; i += 1) {
         thread_create((char *) stacks[i], sizeof(stacks[i]), THREAD_PRIORITY_MAIN, 0, cli_thread,
                       (void *) i, NULL);
-    }
+    }*/
 
     /*
     i2c_init(BMX280_PARAM_I2C_DEV);

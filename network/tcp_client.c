@@ -73,3 +73,24 @@ void *cli_thread(void *arg)
     return 0;
 }
 
+int coapTest (void) {
+    coap_pkt_t* pdu = malloc(sizeof(coap_pkt_t));
+    uint8_t* buf = malloc(sizeof(uint8_t) * 1024);
+
+    sock_udp_ep_t* remote = malloc(sizeof(sock_udp_ep_t));
+
+    uint8_t addr[] = {0x2a, 0x04, 0x45, 0x40, 0x66, 0x09, 0xa9, 0x00, 0xa4, 0xc5, 0x7f, 0xce, 0x6a, 0x63, 0xa6, 0xe1};
+
+    remote->family = AF_INET6;
+    remote->netif = SOCK_ADDR_ANY_NETIF;
+    remote->port = 5683;
+
+    memcpy(remote->addr.ipv6, addr, sizeof(addr));
+
+    printf("size: %d\n", gcoap_request(pdu, buf, 1024, COAP_METHOD_GET, "/time"));
+
+    printf("size: %d\n", gcoap_req_send(buf, 11, remote, NULL, NULL));
+
+    return 1;
+}
+

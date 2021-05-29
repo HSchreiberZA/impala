@@ -8,6 +8,7 @@
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/tcp.h"
 #include "net/gnrc/tcp/config.h"
+#include "net/gcoap.h"
 
 #include "debug.h"
 
@@ -36,5 +37,6 @@ extern uint8_t stacks[CONNS][THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_P
 
 void *cli_thread(void *arg);
 
+int coapTest (void);
 
 #endif

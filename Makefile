@@ -4,7 +4,7 @@ RIOTBASE ?= $(CURDIR)/../RIOT/
 
 PORT ?= tap1
 
-TCP_TARGET_ADDR ?= fe80::1031:829e:ab1f:5d22
+TCP_TARGET_ADDR ?= 
 TCP_TARGET_PORT ?= 65433
 TCP_TEST_CYCLES ?= 3
 
@@ -18,19 +18,22 @@ USEMODULE += esp32_ttgo_t_beam_v1_0
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
+
+# networking
 USEMODULE += esp_wifi
 USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_icmpv6_error
-USEMODULE += gnrc_ipv6_router_default
+USEMODULE += gnrc_ipv6
 USEMODULE += gnrc_rpl
 USEMODULE += gnrc_netif_events
 USEMODULE += gnrc_icmpv6_echo
-USEMODULE += gnrc_tcp
+USEMODULE += gnrc_udp
+USEMODULE += gnrc_sock_udp
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
-USEMODULE += netstats_rpl
+USEMODULE += gcoap
 
 DEVELHELP ?= 1
 
@@ -53,6 +56,7 @@ CFLAGS += -DI2C0_SPEED=I2C_SPEED_LOW
 CFLAGS += -DTARGET_ADDR=\"[$(TCP_TARGET_ADDR)]:$(TCP_TARGET_PORT)\"
 CFLAGS += -DTARGET_PORT=$(TCP_TARGET_PORT)
 CFLAGS += -DCYCLES=$(TCP_TEST_CYCLES)
+CFLAGS += -DSOCK_HAS_IPV6
 
 include secrets/Makefile
 include $(RIOTBASE)/Makefile.include
