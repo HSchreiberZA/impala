@@ -5,6 +5,6 @@
 #include <string.h>
 #include "../utils/minmea.h"
 
-void receiveGPSChar (char c);
+void gps_callback (void *arg, uint8_t data);
 
 #endif

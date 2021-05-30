@@ -14,14 +14,11 @@
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
+int get_all_sensor_readings(int argc, char **argv);
+
 bool SPS30_INIT = false;
 bool BMX280_INIT = false;
 bool GPS_INIT = false;
-
-void gps_callback (void *arg, uint8_t data) {
-    char character = (char)data;
-    receiveGPSChar(character);
-}
 
 void init_hardware (void) {
     i2c_init(BMX280_PARAM_I2C_DEV);
@@ -35,6 +32,25 @@ void init_hardware (void) {
     printf("SPS30 %s\n", SPS30_INIT ? "true" : "false");
     printf("BMX280 %s\n", BMX280_INIT ? "true" : "false");
     printf("GPS %s\n", GPS_INIT ? "true" : "false");
+}
+
+static const shell_command_t shell_commands[] = {
+    { "readings", "Get all sensor readings", get_all_sensor_readings },
+    { NULL, NULL, NULL }
+};
+
+int get_all_sensor_readings(int argc, char **argv) {
+    if (SPS30_INIT) {
+        float readSPS30Value = read_sps30();
+        printf("SPS30 read value: %f\n", readSPS30Value);
+    }
+    
+    if (BMX280_INIT) {
+        printf("Temperature reading %f°C\n", readTemperature());
+        printf("Pressure reading %fkPa\n", readPressure());
+        printf("Humidity reading %f%%\n", readHumidity());
+    }
+    return 0;
 }
 
 int main(void)
@@ -51,28 +67,8 @@ int main(void)
 
     //coapPutTest();
     
-    if (SPS30_INIT) {
-        float readSPS30Value = read_sps30();
-        printf("SPS30 read value: %f\n", readSPS30Value);
-    }
-    
-    if (BMX280_INIT) {
-        printf("Temperature reading %f°C\n", readTemperature());
-        printf("Pressure reading %fkPa\n", readPressure());
-        printf("Humidity reading %f%%\n", readHumidity());
-    }
-    
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
    
-    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
-    printf("This board features a(n) %s MCU.\n", RIOT_MCU);
-
-    while (true)
-    {
-        /* code */
-    }
-    
-
     return 0;
 }

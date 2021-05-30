@@ -70,3 +70,8 @@ void receiveGPSChar (char c) {
         parseGPSMessage(COMPLETE_MESSAGE);
     }
 }
+
+void gps_callback (void *arg, uint8_t data) {
+    char character = (char)data;
+    receiveGPSChar(character);
+}
