@@ -2,12 +2,6 @@ APPLICATION = impala
 BOARD = esp32-ttgo-t-beam
 RIOTBASE ?= $(CURDIR)/../RIOT/
 
-PORT ?= tap1
-
-TCP_TARGET_ADDR ?= 
-TCP_TARGET_PORT ?= 65433
-TCP_TEST_CYCLES ?= 3
-
 # a minimal application Makefile
 # BME280 connected via I2C
 USEMODULE += periph_i2c
@@ -52,10 +46,7 @@ EXTERNAL_MODULE_DIRS += $(CURDIR)/network
 CFLAGS += -DBMX280_PARAM_I2C_DEV=I2C_DEV\(0\)
 CFLAGS += -DBMX280_PARAM_I2C_ADDR=0x76
 CFLAGS += -DI2C0_SPEED=I2C_SPEED_LOW
-# Target Address, Target Port and number of Test Cycles
-CFLAGS += -DTARGET_ADDR=\"[$(TCP_TARGET_ADDR)]:$(TCP_TARGET_PORT)\"
-CFLAGS += -DTARGET_PORT=$(TCP_TARGET_PORT)
-CFLAGS += -DCYCLES=$(TCP_TEST_CYCLES)
+
 CFLAGS += -DSOCK_HAS_IPV6
 
 include secrets/Makefile
