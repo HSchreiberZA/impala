@@ -10,5 +10,6 @@ bool BME280Init(i2c_t i2c_dev, uint8_t i2c_addr);
 float readTemperature(void);
 float readPressure(void);
 float readHumidity(void);
+char* environ_as_partial_json(void);
 
 #endif

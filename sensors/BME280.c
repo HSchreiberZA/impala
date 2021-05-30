@@ -34,3 +34,13 @@ float readPressure(void) {
 float readHumidity(void) {
     return (float)bme280_read_humidity(bmx280_dev)/100.0f;
 }
+
+char* environ_as_partial_json(void) {
+    char* buf = malloc(sizeof(char) * 1024);
+    sprintf(buf, "\"bmx280\": { \
+                        \"temperature\": {\"value\":%f,\"unit\":\"°C\"},\
+                        \"pressure\":{\"value\":%f,\"unit\":\"kPa\"},\
+                        \"humidity\":{\"value\":%f,\"unit\":\"%%\"}\
+                        }", readTemperature(), readPressure(), readHumidity());
+    return buf;
+}

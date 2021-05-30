@@ -29,13 +29,30 @@ void init_hardware (void) {
         GPS_INIT = uart_init(UART_DEV(1), 9600, gps_callback, NULL) == 0;
     }
 
-    printf("SPS30 %s\n", SPS30_INIT ? "true" : "false");
-    printf("BMX280 %s\n", BMX280_INIT ? "true" : "false");
-    printf("GPS %s\n", GPS_INIT ? "true" : "false");
+    printf("SPS30 %s\n", SPS30_INIT ? "enabled" : "disabled");
+    printf("BMX280 %s\n", BMX280_INIT ? "enabled" : "disabled");
+    printf("GPS %s\n", GPS_INIT ? "enabled" : "disabled");
+}
+
+int get_all_sensor_readings_as_json(int argc, char **argv) {
+    /*
+    if (SPS30_INIT) {
+        printf("%s\n", particulate_as_partial_json());
+    }
+    if (BMX280_INIT) {
+        printf("%s\n", environ_as_partial_json());
+    }
+    */
+    if (SPS30_INIT && BMX280_INIT) { 
+        printf("{%s,%s}", particulate_as_partial_json(), environ_as_partial_json());
+
+    }
+    return 0;
 }
 
 static const shell_command_t shell_commands[] = {
     { "readings", "Get all sensor readings", get_all_sensor_readings },
+    { "readingsJS", "Get all sensor readings in json format", get_all_sensor_readings_as_json },
     { NULL, NULL, NULL }
 };
 

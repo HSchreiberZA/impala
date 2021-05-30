@@ -8,5 +8,6 @@
 
 bool init_sps30(void);
 float read_sps30(void);
+char* particulate_as_partial_json(void);
 
 #endif
