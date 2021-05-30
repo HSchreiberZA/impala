@@ -7,5 +7,6 @@
 #include "od.h"
 
 int coapTest (void);
+int coapPutTest (void);
 
 #endif

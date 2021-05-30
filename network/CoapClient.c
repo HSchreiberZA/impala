@@ -15,7 +15,6 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
 static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
                           const sock_udp_ep_t *remote) {
 
-    printf("Response received\n");
     (void)remote;       /* not interested in the source currently */
 
     if (memo->state == GCOAP_MEMO_TIMEOUT) {
@@ -89,7 +88,7 @@ int coapTest (void) {
 
     sock_udp_ep_t* remote = malloc(sizeof(sock_udp_ep_t));
 
-    uint8_t addr[] = {0x2a, 0x04, 0x45, 0x40, 0x66, 0x09, 0xa9, 0x00, 0xa4, 0xc5, 0x7f, 0xce, 0x6a, 0x63, 0xa6, 0xe1};
+    uint8_t addr[] = {0x2a, 0x04, 0x45, 0x40, 0x66, 0x01, 0xab, 0x00, 0x42, 0x8f, 0x14, 0x99, 0xcc, 0xb3, 0x91, 0x07};
 
     remote->family = AF_INET6;
     remote->netif = SOCK_ADDR_ANY_NETIF;
@@ -97,13 +96,42 @@ int coapTest (void) {
 
     memcpy(remote->addr.ipv6, addr, sizeof(addr));
 
-    gcoap_req_init(pdu, buf, 1024, COAP_METHOD_GET, "/other/block");
+    gcoap_req_init(pdu, buf, 1024, COAP_METHOD_GET, "/time");
     coap_hdr_set_type(pdu->hdr, COAP_TYPE_CON);
     ssize_t pduSize = coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 
     //ssize_t pduSize = gcoap_request(pdu, buf, 1024, COAP_METHOD_GET, "/time");
 
     printf("size: %d\n", gcoap_req_send(buf, pduSize, remote, _resp_handler, NULL));
+
+    return 1;
+}
+
+int coapPutTest (void) {
+    coap_pkt_t* pdu = malloc(sizeof(coap_pkt_t));
+    uint8_t* buf = malloc(sizeof(uint8_t) * 1024);
+
+    pdu->payload = malloc(sizeof(char) * 2);
+
+    sock_udp_ep_t* remote = malloc(sizeof(sock_udp_ep_t));
+
+    uint8_t addr[] = {0x2a,0x04,0x45,0x40,0x66,0x01,0xab,0x00,0x42,0x8f,0x14,0x99,0xcc,0xb3,0x91,0x07};
+    char* payload = "Hello from Impala";
+
+    remote->family = AF_INET6;
+    remote->netif = SOCK_ADDR_ANY_NETIF;
+    remote->port = 5683;
+
+    memcpy(remote->addr.ipv6, addr, sizeof(addr));
+
+    gcoap_req_init(pdu, buf, 1024, COAP_METHOD_PUT, "/other/block");
+    coap_hdr_set_type(pdu->hdr, COAP_TYPE_CON);
+    ssize_t pduSize = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
+    coap_payload_put_bytes(pdu, payload, strlen(payload) + 1);
+
+    //ssize_t pduSize = gcoap_request(pdu, buf, 1024, COAP_METHOD_GET, "/time");
+
+    printf("size: %d\n", gcoap_req_send(buf, pduSize + strlen(payload + 1), remote, _resp_handler, NULL));
 
     return 1;
 }

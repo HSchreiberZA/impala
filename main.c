@@ -9,6 +9,7 @@
 #include "xtimer.h"
 #include "sensors/SPS30.h"
 #include "network/CoapClient.h"
+#include "esp_wifi.h"
 
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
@@ -28,7 +29,9 @@ int main(void)
 
     xtimer_sleep(20);
     
-    coapTest();
+    esp_wifi_connect();
+
+    coapPutTest();
 
     //printf("\nStarting Client Threads. TARGET_ADDR=%s, TARGET_PORT=%d, ", TARGET_ADDR, TARGET_PORT);
     //printf("CONNS=%d, NBYTE=%d, CYCLES=%d\n\n", CONNS, NBYTE, CYCLES );
