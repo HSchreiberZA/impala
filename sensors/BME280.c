@@ -1,5 +1,7 @@
 #include "BME280.h"
 
+bmx280_t* bmx280_dev;
+
 bmx280_params_t BMX280Params(i2c_t i2c_dev, uint8_t i2c_addr) {
     bmx280_params_t params;
     params = (bmx280_params_t) {
@@ -15,19 +17,20 @@ bmx280_params_t BMX280Params(i2c_t i2c_dev, uint8_t i2c_addr) {
     return params;
 }
 
-int BME280Init(bmx280_t* dev, i2c_t i2c_dev, uint8_t i2c_addr) {
+bool BME280Init(i2c_t i2c_dev, uint8_t i2c_addr) {
+    bmx280_dev = malloc(sizeof(bmx280_t));
     bmx280_params_t paramValues = BMX280Params(i2c_dev, i2c_addr);
-    return bmx280_init(dev, &paramValues);
+    return bmx280_init(bmx280_dev, &paramValues) == BMX280_OK;
 }
 
-float readTemperature(bmx280_t* dev) {
-    return (float)bmx280_read_temperature(dev) / 100.0f;
+float readTemperature(void) {
+    return (float)bmx280_read_temperature(bmx280_dev) / 100.0f;
 }
 
-float readPressure(bmx280_t* dev) {
-    return (float)bmx280_read_pressure(dev)/1000.0f;
+float readPressure(void) {
+    return (float)bmx280_read_pressure(bmx280_dev)/1000.0f;
 }
 
-float readHumidity(bmx280_t* dev) {
-    return (float)bme280_read_humidity(dev)/100.0f;
+float readHumidity(void) {
+    return (float)bme280_read_humidity(bmx280_dev)/100.0f;
 }
