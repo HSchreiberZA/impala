@@ -37,10 +37,7 @@ float readHumidity(void) {
 
 char* environ_as_partial_json(void) {
     char* buf = malloc(sizeof(char) * 1024);
-    sprintf(buf, "\"bmx280\": { \
-                        \"temperature\": {\"value\":%f,\"unit\":\"°C\"},\
-                        \"pressure\":{\"value\":%f,\"unit\":\"kPa\"},\
-                        \"humidity\":{\"value\":%f,\"unit\":\"%%\"}\
-                        }", readTemperature(), readPressure(), readHumidity());
+    sprintf(buf, "\"bmx280\":{\"temperature\":{\"value\":%f,\"unit\":\"°C\"},\"pressure\":{\"value\":%f,\"unit\":\"kPa\"},\"humidity\":{\"value\":%f,\"unit\":\"%%\"}}",
+            readTemperature(), readPressure(), readHumidity());
     return buf;
 }

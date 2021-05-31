@@ -6,7 +6,7 @@
 #include "net/gcoap.h"
 #include "od.h"
 
-int coapTest (void);
-int coapPutTest (void);
+int coapGETTest (void);
+int coapPutTest (char* payload);
 
 #endif

@@ -6,16 +6,15 @@
 #define _LAST_REQ_PATH_MAX (64)
 static char _last_req_path[_LAST_REQ_PATH_MAX];
 
-static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
-                          const sock_udp_ep_t *remote);
-
 /*
  * Response callback.
  */
-static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
+void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
                           const sock_udp_ep_t *remote) {
 
     (void)remote;       /* not interested in the source currently */
+
+    puts("Message received");
 
     if (memo->state == GCOAP_MEMO_TIMEOUT) {
         printf("gcoap: timeout for msg ID %02u\n", coap_get_id(pdu));
@@ -82,13 +81,13 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
     }
 }
 
-int coapTest (void) {
+int coapGETTest (void) {
     coap_pkt_t* pdu = malloc(sizeof(coap_pkt_t));
     uint8_t* buf = malloc(sizeof(uint8_t) * 1024);
 
     sock_udp_ep_t* remote = malloc(sizeof(sock_udp_ep_t));
 
-    uint8_t addr[] = {0x2a, 0x04, 0x45, 0x40, 0x66, 0x01, 0xab, 0x00, 0x42, 0x8f, 0x14, 0x99, 0xcc, 0xb3, 0x91, 0x07};
+    uint8_t addr[] = {0x2a,0x04,0x45,0x40,0x66,0x03,0x5b,0x00,0x18,0x2c,0x99,0x0e,0x52,0xc1,0x1b,0x36};
 
     remote->family = AF_INET6;
     remote->netif = SOCK_ADDR_ANY_NETIF;
@@ -96,7 +95,7 @@ int coapTest (void) {
 
     memcpy(remote->addr.ipv6, addr, sizeof(addr));
 
-    gcoap_req_init(pdu, buf, 1024, COAP_METHOD_GET, "/time");
+    gcoap_req_init(pdu, buf, 1024, COAP_METHOD_GET, "/whoami");
     coap_hdr_set_type(pdu->hdr, COAP_TYPE_CON);
     ssize_t pduSize = coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 
@@ -107,7 +106,7 @@ int coapTest (void) {
     return 1;
 }
 
-int coapPutTest (void) {
+int coapPutTest (char* payload) {
     coap_pkt_t* pdu = malloc(sizeof(coap_pkt_t));
     uint8_t* buf = malloc(sizeof(uint8_t) * 1024);
 
@@ -115,8 +114,7 @@ int coapPutTest (void) {
 
     sock_udp_ep_t* remote = malloc(sizeof(sock_udp_ep_t));
 
-    uint8_t addr[] = {0x2a,0x04,0x45,0x40,0x66,0x01,0xab,0x00,0x42,0x8f,0x14,0x99,0xcc,0xb3,0x91,0x07};
-    char* payload = "Hello from Impala";
+    uint8_t addr[] = {0x2a,0x04,0x45,0x40,0x66,0x03,0x5b,0x00,0x18,0x2c,0x99,0x0e,0x52,0xc1,0x1b,0x36};
 
     remote->family = AF_INET6;
     remote->netif = SOCK_ADDR_ANY_NETIF;
@@ -127,11 +125,9 @@ int coapPutTest (void) {
     gcoap_req_init(pdu, buf, 1024, COAP_METHOD_PUT, "/other/block");
     coap_hdr_set_type(pdu->hdr, COAP_TYPE_CON);
     ssize_t pduSize = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
-    coap_payload_put_bytes(pdu, payload, strlen(payload) + 1);
+    ssize_t payloadSize = coap_payload_put_bytes(pdu, payload, strlen(payload));
 
-    //ssize_t pduSize = gcoap_request(pdu, buf, 1024, COAP_METHOD_GET, "/time");
-
-    printf("size: %d\n", gcoap_req_send(buf, pduSize + strlen(payload + 1), remote, _resp_handler, NULL));
+    printf("size: %d\n", gcoap_req_send(buf, pduSize + payloadSize, remote, _resp_handler, NULL));
 
     return 1;
 }

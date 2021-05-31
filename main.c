@@ -50,9 +50,26 @@ int get_all_sensor_readings_as_json(int argc, char **argv) {
     return 0;
 }
 
+int send_to_server(int argc, char **argv) {
+    char* buf = malloc(sizeof(char) * 2048);
+    if (SPS30_INIT && BMX280_INIT) { 
+        sprintf(buf, "{%s,%s}", particulate_as_partial_json(), environ_as_partial_json());
+        coapPutTest(buf);
+    }
+    return 0;
+}
+
+int get_from_server(int argc, char **argv) {
+    coapGETTest();
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "readings", "Get all sensor readings", get_all_sensor_readings },
     { "readingsJS", "Get all sensor readings in json format", get_all_sensor_readings_as_json },
+    { "sendReadings", "Send all readings to coap server", send_to_server },
+    { "get", "perform a get request coap server", get_from_server },
+
     { NULL, NULL, NULL }
 };
 
