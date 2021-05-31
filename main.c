@@ -43,8 +43,8 @@ int get_all_sensor_readings_as_json(int argc, char **argv) {
         printf("%s\n", environ_as_partial_json());
     }
     */
-    if (SPS30_INIT && BMX280_INIT) { 
-        printf("{%s,%s}", particulate_as_partial_json(), environ_as_partial_json());
+    if (SPS30_INIT && BMX280_INIT && GPS_INIT) { 
+        printf("{%s,%s,%s}", particulate_as_partial_json(), environ_as_partial_json(), gps_as_partial_json());
 
     }
     return 0;
@@ -52,8 +52,8 @@ int get_all_sensor_readings_as_json(int argc, char **argv) {
 
 int send_to_server(int argc, char **argv) {
     char* buf = malloc(sizeof(char) * 2048);
-    if (SPS30_INIT && BMX280_INIT) { 
-        sprintf(buf, "{%s,%s}", particulate_as_partial_json(), environ_as_partial_json());
+    if (SPS30_INIT && BMX280_INIT && GPS_INIT) { 
+        sprintf(buf, "{%s,%s,%s}", particulate_as_partial_json(), environ_as_partial_json(), gps_as_partial_json());
         coapPutTest(buf);
     }
     return 0;
@@ -89,8 +89,6 @@ int get_all_sensor_readings(int argc, char **argv) {
 
 int main(void)
 {
-    puts("Hello World!");
-
     board_init();
     init_hardware();
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
@@ -98,8 +96,6 @@ int main(void)
     //xtimer_sleep(20);
     
     esp_wifi_connect();
-
-    //coapPutTest();
     
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);

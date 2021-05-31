@@ -3,20 +3,24 @@
 char COMPLETE_MESSAGE[MINMEA_MAX_LENGTH];
 char PARTIAL_MESSAGE[MINMEA_MAX_LENGTH];
 
+double latitude;
+double longitude;
+bool valid;
+
 void parseGPSMessage (char* line) {
     switch (minmea_sentence_id(line, false)) {
         case MINMEA_SENTENCE_RMC: {
             struct minmea_sentence_rmc frame;
             if (minmea_parse_rmc(&frame, line)) {
-                printf("$RMC: raw coordinates and speed: (%d/%d,%d/%d) %d/%d\n",
+                DEBUG("$RMC: raw coordinates and speed: (%d/%d,%d/%d) %d/%d\n",
                         frame.latitude.value, frame.latitude.scale,
                         frame.longitude.value, frame.longitude.scale,
                         frame.speed.value, frame.speed.scale);
-                printf("$RMC fixed-point coordinates and speed scaled to three decimal places: (%d,%d) %d\n",
+                DEBUG("$RMC fixed-point coordinates and speed scaled to three decimal places: (%d,%d) %d\n",
                         minmea_rescale(&frame.latitude, 1000),
                         minmea_rescale(&frame.longitude, 1000),
                         minmea_rescale(&frame.speed, 1000));
-                printf("$RMC floating point degree coordinates and speed: (%f,%f) %f\n",
+                DEBUG("$RMC floating point degree coordinates and speed: (%f,%f) %f\n",
                         minmea_tocoord(&frame.latitude),
                         minmea_tocoord(&frame.longitude),
                         minmea_todouble(&frame.speed));
@@ -26,17 +30,17 @@ void parseGPSMessage (char* line) {
         case MINMEA_SENTENCE_GGA: {
             struct minmea_sentence_gga frame;
             if (minmea_parse_gga(&frame, line)) {
-                printf("$GGA: fix quality: %d\n", frame.fix_quality);
+                DEBUG("$GGA: fix quality: %d\n", frame.fix_quality);
             }
         } break;
 
         case MINMEA_SENTENCE_GSV: {
             struct minmea_sentence_gsv frame;
             if (minmea_parse_gsv(&frame, line)) {
-                printf("$GSV: message %d of %d\n", frame.msg_nr, frame.total_msgs);
-                printf("$GSV: sattelites in view: %d\n", frame.total_sats);
+                DEBUG("$GSV: message %d of %d\n", frame.msg_nr, frame.total_msgs);
+                DEBUG("$GSV: sattelites in view: %d\n", frame.total_sats);
                 for (int i = 0; i < 4; i++)
-                    printf("$GSV: sat nr %d, elevation: %d, azimuth: %d, snr: %d dbm\n",
+                    DEBUG("$GSV: sat nr %d, elevation: %d, azimuth: %d, snr: %d dbm\n",
                         frame.sats[i].nr,
                         frame.sats[i].elevation,
                         frame.sats[i].azimuth,
@@ -47,15 +51,25 @@ void parseGPSMessage (char* line) {
         case MINMEA_SENTENCE_GLL: {
             struct minmea_sentence_gll frame;
             if (minmea_parse_gll(&frame, line)) {
-                printf("$GLL: mode %c\n", frame.mode);
-                printf("$GLL: status %c\n", frame.status);
-                printf("$GLL: latitude %f\n", minmea_tocoord(&frame.latitude));
-                printf("$GLL: longitude %f\n", minmea_tocoord(&frame.longitude));
+                DEBUG("$GLL: mode %c\n", frame.mode);
+                DEBUG("$GLL: status %c\n", frame.status);
+                DEBUG("$GLL: latitude %f\n", minmea_tocoord(&frame.latitude));
+                DEBUG("$GLL: longitude %f\n", minmea_tocoord(&frame.longitude));
+                latitude = minmea_tocoord(&frame.latitude);
+                longitude = minmea_tocoord(&frame.longitude);
+                valid = frame.status == 'A';
             }
         } break;
         default:
         break;
     }
+}
+
+char* gps_as_partial_json(void) {
+    char* buf = malloc(sizeof(char) * 1024);
+    sprintf(buf, "\"gps\":{\"latitude\":%f,\"longitude\":%f,\"valid\":%d}",
+            latitude, longitude, valid);
+    return buf;
 }
 
 
