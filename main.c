@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "periph/uart.h"
 #include "periph/i2c.h"
 #include "sensors/GPSUtils.h"
@@ -14,8 +15,7 @@
 
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
-
-int get_all_sensor_readings(int argc, char **argv);
+char thread_stack[THREAD_STACKSIZE_MAIN];
 
 bool SPS30_INIT = false;
 bool BMX280_INIT = false;
@@ -51,19 +51,46 @@ int send_to_server(int argc, char **argv) {
     return 0;
 }
 
+void *rcv_thread(void *arg) {
+    char* buf = malloc(sizeof(char) * 1024);
+
+    while(true) {
+        double interval = 10; /* seconds */
+
+        /* start time */
+        time_t start = time(NULL);
+
+        /* do something */
+        if (SPS30_INIT && BMX280_INIT && GPS_INIT) {
+            char* device_info = device_info_as_partial_json();
+            char* particulate_info = particulate_as_partial_json();
+            char* environ_info = environ_as_partial_json();
+            char* gps_info = gps_as_partial_json();
+            sprintf(buf, "{%s,%s,%s,%s}", device_info, particulate_info, environ_info, gps_info);
+            coapPutTest(buf);
+            free(device_info);
+            free(particulate_info);
+            free(environ_info);
+            free(gps_info);
+        }
+
+        /* end time */
+        time_t end = time(NULL);
+
+        /* compute remaining time to sleep and sleep */
+        double elapsed = difftime(end, start);
+        int seconds_to_sleep = (int)(interval - elapsed);
+        if (seconds_to_sleep > 0) { /* don't sleep if we're already late */
+            xtimer_sleep(seconds_to_sleep);
+        }
+    }
+    return 0;
+}
+
 int get_from_server(int argc, char **argv) {
     coapGETTest();
     return 0;
 }
-
-static const shell_command_t shell_commands[] = {
-    { "readings", "Get all sensor readings", get_all_sensor_readings },
-    { "readingsJS", "Get all sensor readings in json format", get_all_sensor_readings_as_json },
-    { "sendReadings", "Send all readings to coap server", send_to_server },
-    { "get", "perform a get request coap server", get_from_server },
-
-    { NULL, NULL, NULL }
-};
 
 int get_all_sensor_readings(int argc, char **argv) {
     if (SPS30_INIT) {
@@ -79,16 +106,43 @@ int get_all_sensor_readings(int argc, char **argv) {
     return 0;
 }
 
+int start_thread(int argc, char **argv) {
+    char *end;
+    const long i = strtol(argv[1], &end, 10);
+    printf("%ld\n", i);
+    thread_wakeup(i);
+    return 1;
+}
+
+static const shell_command_t shell_commands[] = {
+    { "readings", "Get all sensor readings", get_all_sensor_readings },
+    { "readingsJS", "Get all sensor readings in json format", get_all_sensor_readings_as_json },
+    { "sendReadings", "Send all readings to coap server", send_to_server },
+    { "get", "perform a get request coap server", get_from_server },
+    { "startThread", "starts the messenger thread", start_thread },
+
+    { NULL, NULL, NULL }
+};
+
 int main(void)
 {
     board_init();
     init_hardware();
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
+    
+    esp_err_t res = esp_wifi_connect();
 
-    //xtimer_sleep(20);
+    kernel_pid_t messenger =  thread_create(thread_stack, sizeof(thread_stack),
+                  THREAD_PRIORITY_MAIN + 1, THREAD_CREATE_SLEEPING ,
+                  rcv_thread, NULL, "send_to_server");
     
-    esp_wifi_connect();
-    
+    if (res == ESP_OK) {
+        xtimer_t* timer = malloc(sizeof(xtimer_t));
+        xtimer_set_wakeup64(timer, 500, messenger);
+    }
+
+    printf("messenger Thread id: %d\n", messenger);
+
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
    
