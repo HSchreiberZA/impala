@@ -67,8 +67,14 @@ void parseGPSMessage (char* line) {
 
 char* gps_as_partial_json(void) {
     char* buf = malloc(sizeof(char) * 1024);
-    sprintf(buf, "\"gps\":{\"latitude\":%f,\"longitude\":%f,\"valid\":%d}",
-            latitude, longitude, valid);
+    if (valid) {
+        sprintf(buf, "\"gps\":{\"latitude\":%f,\"longitude\":%f,\"valid\":%d}",
+                latitude, longitude, valid);
+    } else {
+        sprintf(buf, "\"gps\":{\"latitude\":%f,\"longitude\":%f,\"valid\":%d}",
+                -100.0f, -200.0f, valid);
+    }
+
     return buf;
 }
 

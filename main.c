@@ -8,6 +8,7 @@
 #include "shell.h"
 #include "xtimer.h"
 #include "sensors/SPS30.h"
+#include "sensors/Device.h"
 #include "network/CoapClient.h"
 #include "esp_wifi.h"
 
@@ -35,17 +36,8 @@ void init_hardware (void) {
 }
 
 int get_all_sensor_readings_as_json(int argc, char **argv) {
-    /*
-    if (SPS30_INIT) {
-        printf("%s\n", particulate_as_partial_json());
-    }
-    if (BMX280_INIT) {
-        printf("%s\n", environ_as_partial_json());
-    }
-    */
-    if (SPS30_INIT && BMX280_INIT && GPS_INIT) { 
-        printf("{%s,%s,%s}", particulate_as_partial_json(), environ_as_partial_json(), gps_as_partial_json());
-
+    if (SPS30_INIT && BMX280_INIT && GPS_INIT) {
+        printf("{%s,%s,%s,%s}", device_info_as_partial_json(), particulate_as_partial_json(), environ_as_partial_json(), gps_as_partial_json());
     }
     return 0;
 }
@@ -53,7 +45,7 @@ int get_all_sensor_readings_as_json(int argc, char **argv) {
 int send_to_server(int argc, char **argv) {
     char* buf = malloc(sizeof(char) * 2048);
     if (SPS30_INIT && BMX280_INIT && GPS_INIT) { 
-        sprintf(buf, "{%s,%s,%s}", particulate_as_partial_json(), environ_as_partial_json(), gps_as_partial_json());
+        sprintf(buf, "{%s,%s,%s,%s}", device_info_as_partial_json(), particulate_as_partial_json(), environ_as_partial_json(), gps_as_partial_json());
         coapPutTest(buf);
     }
     return 0;

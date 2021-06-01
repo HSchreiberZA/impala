@@ -87,7 +87,7 @@ int coapGETTest (void) {
 
     sock_udp_ep_t* remote = malloc(sizeof(sock_udp_ep_t));
 
-    uint8_t addr[] = {0x2a,0x04,0x45,0x40,0x66,0x03,0x5b,0x00,0x18,0x2c,0x99,0x0e,0x52,0xc1,0x1b,0x36};
+    uint8_t addr[] = {0x2a,0x04,0x45,0x40,0x66,0x0a,0xd3,0x00,0xc1,0x59,0x8b,0xb1,0x1b,0x69,0xfb,0xfc};
 
     remote->family = AF_INET6;
     remote->netif = SOCK_ADDR_ANY_NETIF;
@@ -95,7 +95,7 @@ int coapGETTest (void) {
 
     memcpy(remote->addr.ipv6, addr, sizeof(addr));
 
-    gcoap_req_init(pdu, buf, 1024, COAP_METHOD_GET, "/whoami");
+    gcoap_req_init(pdu, buf, 1024, COAP_METHOD_GET, "/time");
     coap_hdr_set_type(pdu->hdr, COAP_TYPE_CON);
     ssize_t pduSize = coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 
@@ -114,7 +114,7 @@ int coapPutTest (char* payload) {
 
     sock_udp_ep_t* remote = malloc(sizeof(sock_udp_ep_t));
 
-    uint8_t addr[] = {0x2a,0x04,0x45,0x40,0x66,0x03,0x5b,0x00,0x18,0x2c,0x99,0x0e,0x52,0xc1,0x1b,0x36};
+    uint8_t addr[] = {0x2a,0x04,0x45,0x40,0x66,0x0a,0xd3,0x00,0xc1,0x59,0x8b,0xb1,0x1b,0x69,0xfb,0xfc};
 
     remote->family = AF_INET6;
     remote->netif = SOCK_ADDR_ANY_NETIF;
@@ -122,7 +122,7 @@ int coapPutTest (char* payload) {
 
     memcpy(remote->addr.ipv6, addr, sizeof(addr));
 
-    gcoap_req_init(pdu, buf, 1024, COAP_METHOD_PUT, "/other/block");
+    gcoap_req_init(pdu, buf, 1024, COAP_METHOD_PUT, "/reading");
     coap_hdr_set_type(pdu->hdr, COAP_TYPE_CON);
     ssize_t pduSize = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
     ssize_t payloadSize = coap_payload_put_bytes(pdu, payload, strlen(payload));
