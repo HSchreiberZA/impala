@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "periph/uart.h"
 #include "periph/i2c.h"
 #include "sensors/GPSUtils.h"
@@ -53,14 +54,10 @@ int send_to_server(int argc, char **argv) {
 
 void *rcv_thread(void *arg) {
     char* buf = malloc(sizeof(char) * 1024);
+    xtimer_ticks32_t last_wakeup = xtimer_now();
+    uint32_t period = 60000000;
 
     while(true) {
-        double interval = 10; /* seconds */
-
-        /* start time */
-        time_t start = time(NULL);
-
-        /* do something */
         if (SPS30_INIT && BMX280_INIT && GPS_INIT) {
             char* device_info = device_info_as_partial_json();
             char* particulate_info = particulate_as_partial_json();
@@ -73,16 +70,7 @@ void *rcv_thread(void *arg) {
             free(environ_info);
             free(gps_info);
         }
-
-        /* end time */
-        time_t end = time(NULL);
-
-        /* compute remaining time to sleep and sleep */
-        double elapsed = difftime(end, start);
-        int seconds_to_sleep = (int)(interval - elapsed);
-        if (seconds_to_sleep > 0) { /* don't sleep if we're already late */
-            xtimer_sleep(seconds_to_sleep);
-        }
+        xtimer_periodic_wakeup(&last_wakeup, period);
     }
     return 0;
 }
