@@ -5,6 +5,20 @@
  * completes or times out. */
 #define _LAST_REQ_PATH_MAX (64)
 static char _last_req_path[_LAST_REQ_PATH_MAX];
+const uint8_t ADDRESS[] = {0xfd,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xba,0x27,0xeb,0xff,0xfe,0x19,0x84,0x96};
+
+
+/*
+ *   BEGIN Private methods
+ */
+
+void configure_remote(sock_udp_ep_t* remote) {
+    remote->family = AF_INET6;
+    remote->netif = SOCK_ADDR_ANY_NETIF;
+    remote->port = 5683;
+
+    memcpy(remote->addr.ipv6, ADDRESS, sizeof(ADDRESS));
+}
 
 /*
  * Response callback.
@@ -81,44 +95,35 @@ void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
     }
 }
 
-int coapGETTest (void) {
+/*
+ *   END Private methods
+ */
+
+int perform_get (void) {
     coap_pkt_t* pdu = malloc(sizeof(coap_pkt_t));
     uint8_t* buf = malloc(sizeof(uint8_t) * 1024);
 
     sock_udp_ep_t* remote = malloc(sizeof(sock_udp_ep_t));
-
-    uint8_t addr[] = {0x2a,0x04,0x45,0x40,0x66,0x0a,0xd3,0x00,0x7e,0x34,0x36,0x72,0xe2,0x2b,0x52,0x86};
-
-    remote->family = AF_INET6;
-    remote->netif = SOCK_ADDR_ANY_NETIF;
-    remote->port = 5683;
-
-    memcpy(remote->addr.ipv6, addr, sizeof(addr));
-
+    configure_remote(remote);
+    
     gcoap_req_init(pdu, buf, 1024, COAP_METHOD_GET, "/time");
     coap_hdr_set_type(pdu->hdr, COAP_TYPE_CON);
     ssize_t pduSize = coap_opt_finish(pdu, COAP_OPT_FINISH_NONE);
 
-    //ssize_t pduSize = gcoap_request(pdu, buf, 1024, COAP_METHOD_GET, "/time");
-
     printf("size: %d\n", gcoap_req_send(buf, pduSize, remote, _resp_handler, NULL));
+    free(pdu);
+    free(buf);
+    free(remote);
 
-    return 1;
+    return 0;
 }
 
-int coapPutTest (char* payload) {
+int perform_put (char* payload) {
     coap_pkt_t* pdu = malloc(sizeof(coap_pkt_t));
     uint8_t* buf = malloc(sizeof(uint8_t) * 1024);
 
     sock_udp_ep_t* remote = malloc(sizeof(sock_udp_ep_t));
-
-    uint8_t addr[] = {0x2a,0x04,0x45,0x40,0x66,0x0a,0xd3,0x00,0x7e,0x34,0x36,0x72,0xe2,0x2b,0x52,0x86};
-
-    remote->family = AF_INET6;
-    remote->netif = SOCK_ADDR_ANY_NETIF;
-    remote->port = 5683;
-
-    memcpy(remote->addr.ipv6, addr, sizeof(addr));
+    configure_remote(remote);
 
     gcoap_req_init(pdu, buf, 1024, COAP_METHOD_PUT, "/reading");
     coap_hdr_set_type(pdu->hdr, COAP_TYPE_CON);
@@ -128,6 +133,7 @@ int coapPutTest (char* payload) {
     printf("size: %d\n", gcoap_req_send(buf, pduSize + payloadSize, remote, _resp_handler, NULL));
     free(pdu);
     free(buf);
+    free(remote);
 
-    return 1;
+    return 0;
 }

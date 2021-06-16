@@ -47,7 +47,7 @@ int send_to_server(int argc, char **argv) {
     char* buf = malloc(sizeof(char) * 2048);
     if (SPS30_INIT && BMX280_INIT && GPS_INIT) { 
         sprintf(buf, "{%s,%s,%s,%s}", device_info_as_partial_json(), particulate_as_partial_json(), environ_as_partial_json(), gps_as_partial_json());
-        coapPutTest(buf);
+        perform_put(buf);
     }
     return 0;
 }
@@ -64,7 +64,7 @@ void *rcv_thread(void *arg) {
             char* environ_info = environ_as_partial_json();
             char* gps_info = gps_as_partial_json();
             sprintf(buf, "{%s,%s,%s,%s}", device_info, particulate_info, environ_info, gps_info);
-            coapPutTest(buf);
+            perform_put(buf);
             free(device_info);
             free(particulate_info);
             free(environ_info);
@@ -76,7 +76,7 @@ void *rcv_thread(void *arg) {
 }
 
 int get_from_server(int argc, char **argv) {
-    coapGETTest();
+    perform_get();
     return 0;
 }
 
