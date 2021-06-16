@@ -55,7 +55,7 @@ int send_to_server(int argc, char **argv) {
 void *rcv_thread(void *arg) {
     char* buf = malloc(sizeof(char) * 1024);
     xtimer_ticks32_t last_wakeup = xtimer_now();
-    uint32_t period = 60000000;
+    uint32_t period = 300000000;
 
     while(true) {
         if (SPS30_INIT && BMX280_INIT && GPS_INIT) {

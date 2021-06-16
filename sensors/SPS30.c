@@ -50,7 +50,7 @@ float read_sps30(void) {
     int* error = malloc(sizeof(int));
     if(start_measurement_sps30()) {
         // wait for sensor to power up
-        xtimer_sleep(10);
+        xtimer_sleep(30);
         while (!sps30_data_ready(sps30_dev, error)){
             puts("Waiting for SPS30 measurement data...");
         }
@@ -78,5 +78,5 @@ char* particulate_as_partial_json(void) {
                 data->mc_pm1, data->mc_pm2_5, data->mc_pm4, data->mc_pm10, data->nc_pm0_5, data->nc_pm1, data->nc_pm2_5, data->nc_pm4, data->nc_pm10, data->ps);
         return buf;
     }
-    return "";
+    return "\"sps30\":{}";
 }
