@@ -69,6 +69,15 @@ void *rcv_thread(void *arg) {
             free(particulate_info);
             free(environ_info);
             free(gps_info);
+        } else if (SPS30_INIT && BMX280_INIT) {
+            char* device_info = device_info_as_partial_json();
+            char* particulate_info = particulate_as_partial_json();
+            char* environ_info = environ_as_partial_json();
+            sprintf(buf, "{%s,%s,%s}", device_info, particulate_info, environ_info);
+            perform_put(buf);
+            free(device_info);
+            free(particulate_info);
+            free(environ_info);
         }
         xtimer_periodic_wakeup(&last_wakeup, period);
     }

@@ -66,7 +66,7 @@ char* particulate_as_partial_json(void) {
     int* error = malloc(sizeof(int));
     if(start_measurement_sps30()) {
         // wait for sensor to power up
-        xtimer_sleep(10);
+        xtimer_sleep(30);
         while (!sps30_data_ready(sps30_dev, error)){
             puts("Waiting for SPS30 measurement data...");
         }
