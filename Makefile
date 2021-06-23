@@ -51,6 +51,6 @@ CFLAGS += -DSOCK_HAS_IPV6
 CFLAGS += -DENABLE_GPS=0
 CFLAGS += -DNODE_ID=1
 
-
-include secrets/Makefile
+CFLAGS += -DESP_WIFI_SSID=\"ssid\" 
+CFLAGS += -DESP_WIFI_PASS=\"password\"
 include $(RIOTBASE)/Makefile.include
