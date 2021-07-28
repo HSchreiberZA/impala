@@ -31,6 +31,8 @@ USEMODULE += gcoap
 
 DEVELHELP ?= 1
 
+EXTERNAL_MODULE_DIRS = external
+
 USEMODULE += sensors
 USEMODULE += utils
 USEMODULE += network
