@@ -3,15 +3,15 @@
 #include <time.h>
 #include "periph/uart.h"
 #include "periph/i2c.h"
-#include "sensors/GPSUtils.h"
-#include "sensors/BME280.h"
+#include "external/sensors/GPSUtils.h"
+#include "external/sensors/BME280.h"
 #include "thread.h"
 #include "msg.h"
 #include "shell.h"
 #include "xtimer.h"
-#include "sensors/SPS30.h"
-#include "sensors/Device.h"
-#include "network/CoapClient.h"
+#include "external/sensors/SPS30.h"
+#include "external/sensors/Device.h"
+#include "external/network/CoapClient.h"
 #include "esp_wifi.h"
 
 #define MAIN_QUEUE_SIZE     (8)

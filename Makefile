@@ -32,13 +32,8 @@ USEMODULE += gcoap
 DEVELHELP ?= 1
 
 USEMODULE += sensors
-EXTERNAL_MODULE_DIRS += $(CURDIR)/sensors
-
 USEMODULE += utils
-EXTERNAL_MODULE_DIRS += $(CURDIR)/utils
-
 USEMODULE += network
-EXTERNAL_MODULE_DIRS += $(CURDIR)/network
 
 # When using I2C, specify the default I2C device to use,
 # and the BME280's address (see datasheet).
