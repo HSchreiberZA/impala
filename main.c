@@ -3,15 +3,15 @@
 #include <time.h>
 #include "periph/uart.h"
 #include "periph/i2c.h"
-#include "sensors/GPSUtils.h"
-#include "sensors/BME280.h"
+#include "external/sensors/GPSUtils.h"
+#include "external/sensors/BME280.h"
 #include "thread.h"
 #include "msg.h"
 #include "shell.h"
 #include "xtimer.h"
-#include "sensors/SPS30.h"
-#include "sensors/Device.h"
-#include "network/CoapClient.h"
+#include "external/sensors/SPS30.h"
+#include "external/sensors/Device.h"
+#include "external/network/CoapClient.h"
 #include "esp_wifi.h"
 
 #define MAIN_QUEUE_SIZE     (8)
@@ -39,6 +39,8 @@ void init_hardware (void) {
 int get_all_sensor_readings_as_json(int argc, char **argv) {
     if (SPS30_INIT && BMX280_INIT && GPS_INIT) {
         printf("{%s,%s,%s,%s}", device_info_as_partial_json(), particulate_as_partial_json(), environ_as_partial_json(), gps_as_partial_json());
+    } else if (BMX280_INIT && GPS_INIT) {
+        printf("{%s,%s, %s}", device_info_as_partial_json(),environ_as_partial_json(), gps_as_partial_json());
     }
     return 0;
 }
@@ -48,6 +50,8 @@ int send_to_server(int argc, char **argv) {
     if (SPS30_INIT && BMX280_INIT && GPS_INIT) { 
         sprintf(buf, "{%s,%s,%s,%s}", device_info_as_partial_json(), particulate_as_partial_json(), environ_as_partial_json(), gps_as_partial_json());
         perform_put(buf);
+    } else if (BMX280_INIT && GPS_INIT) {
+        printf("{%s,%s, %s}", device_info_as_partial_json(),environ_as_partial_json(), gps_as_partial_json());
     }
     return 0;
 }
@@ -78,6 +82,15 @@ void *rcv_thread(void *arg) {
             free(device_info);
             free(particulate_info);
             free(environ_info);
+        } else if (BMX280_INIT && GPS_INIT) {
+            char* device_info = device_info_as_partial_json();
+            char* environ_info = environ_as_partial_json();
+            char* gps_info = gps_as_partial_json();
+            sprintf(buf, "{%s,%s,%s}", device_info, environ_info, gps_info);
+            perform_put(buf);
+            free(device_info);
+            free(environ_info);
+            free(gps_info);
         }
         xtimer_periodic_wakeup(&last_wakeup, period);
     }
