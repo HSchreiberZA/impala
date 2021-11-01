@@ -41,6 +41,8 @@ int get_all_sensor_readings_as_json(int argc, char **argv) {
         printf("{%s,%s,%s,%s}", device_info_as_partial_json(), particulate_as_partial_json(), environ_as_partial_json(), gps_as_partial_json());
     } else if (BMX280_INIT && GPS_INIT) {
         printf("{%s,%s, %s}", device_info_as_partial_json(),environ_as_partial_json(), gps_as_partial_json());
+    } else if (BMX280_INIT) {
+        printf("{%s,%s}", device_info_as_partial_json(),environ_as_partial_json());
     }
     return 0;
 }
@@ -52,6 +54,8 @@ int send_to_server(int argc, char **argv) {
         perform_put(buf);
     } else if (BMX280_INIT && GPS_INIT) {
         printf("{%s,%s, %s}", device_info_as_partial_json(),environ_as_partial_json(), gps_as_partial_json());
+    } else if (BMX280_INIT) {
+        printf("{%s,%s}", device_info_as_partial_json(),environ_as_partial_json());
     }
     return 0;
 }
@@ -91,6 +95,13 @@ void *rcv_thread(void *arg) {
             free(device_info);
             free(environ_info);
             free(gps_info);
+        } else if (BMX280_INIT) {
+            char* device_info = device_info_as_partial_json();
+            char* environ_info = environ_as_partial_json();
+            sprintf(buf, "{%s,%s}", device_info, environ_info);
+            perform_put(buf);
+            free(device_info);
+            free(environ_info);
         }
         xtimer_periodic_wakeup(&last_wakeup, period);
     }
